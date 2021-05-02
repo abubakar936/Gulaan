@@ -1,6 +1,6 @@
 const express = require('express');
 const Joi = require('joi');
-const { tailor_validation, Tailor } = require('../Models/tailor');
+const { tailor_validation, Tailor } = require('../models/tailor');
 const router = express.Router();
 const upload = require('../multer')
 const cloudinary = require('../cloudinary')
