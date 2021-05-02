@@ -9,10 +9,11 @@ var corsOptions = {
     origin: "*",
     optionsSuccessStatus: 200 // For legacy browser support
 }
+app.set('view engine', 'ejs');
 app.use(cors(corsOptions));
 app.use(express.json());
-
-
+// var port = process.env.PORT || 8080;
+app.use(express.static(__dirname + '/public'));
 app.use('/api/tailor', tailor);
 app.use('/api/user', user);
 
@@ -24,7 +25,7 @@ mongoose.connect("mongodb://localhost:27017/Gulaan",
     .catch((err) => console.log(err));
 
 app.get('/', (req, res) => {
-    res.send('Hello World!')
+    res.render('index');
 })
 
 
