@@ -25,7 +25,8 @@ mongoose.connect("mongodb://localhost:27017/Gulaan",
     .catch((err) => console.log(err));
 
 app.get('/', (req, res) => {
-    res.render('index');
+    res.send("hello world!")
+    // res.render('index');
 })
 
 
