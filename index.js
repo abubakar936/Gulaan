@@ -18,7 +18,7 @@ app.use('/api/tailor', tailor);
 app.use('/api/user', user);
 
 const mongoose = require('mongoose');
-mongoose.connect("mongodb://localhost:27017/Gulaan",
+mongoose.connect("mongodb+srv://Abubakar:DfohKvcRnMz7UOjm@cluster0.z1hqb.mongodb.net/Gulaan",
     { useNewUrlParser: true },
     { useUnifiedTopology: true })
     .then(() => console.log("Connected to Gulaan...."))
