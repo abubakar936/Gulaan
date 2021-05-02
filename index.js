@@ -25,7 +25,7 @@ mongoose.connect("mongodb+srv://Abubakar:DfohKvcRnMz7UOjm@cluster0.z1hqb.mongodb
     .catch((err) => console.log(err));
 
 app.get('/', (req, res) => {
-    res.send("hello world!")
+    res.send("Welcome to Gulaan!")
     // res.render('index');
 })
 
