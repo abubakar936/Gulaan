@@ -156,6 +156,9 @@ router.get('/get_profile/:tailor_id', async (req, res) => {
                 data: get_tailor,
             })
 })
+
+
+
 //-----  update contact no    ------//
 router.put('/contact/:tailor_id', async (req, res) => {
     try {

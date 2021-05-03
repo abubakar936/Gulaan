@@ -101,7 +101,9 @@ const tailor_schema = new mongoose.Schema
         },
         profile_photo: {
             type: String
-        }
+        },
+
+
     })
 
 const Tailor = mongoose.model('Tailor', tailor_schema);

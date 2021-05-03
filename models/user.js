@@ -78,7 +78,24 @@ const user_schema = new mongoose.Schema
         },
         profile_photo: {
             type: String
-        }
+        },
+        favorite_tailors: [{
+            tailor_id: {
+                type: mongoose.Schema.Types.ObjectId
+            },
+            first_name: {
+                type: String,
+            },
+            last_name: {
+                type: String,
+            },
+            city: {
+                type: String,
+            },
+            type_of_tailor: {
+                type: String,
+            }
+        }]
     })
 
 const User = mongoose.model('User', user_schema);

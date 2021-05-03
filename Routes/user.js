@@ -1,10 +1,11 @@
 const express = require('express');
 const Joi = require('joi');
-const { user_validation, User } = require('../models/user');
+const { user_validation, User } = require('../models/user')
 const router = express.Router();
 const upload = require('../multer')
 const cloudinary = require('../cloudinary')
 const fs = require('fs');
+const { Tailor } = require('../models/tailor');
 
 //-----     signup     ------//
 router.post('/signup', async (req, res) => {
@@ -89,6 +90,126 @@ router.post('/login', async (req, res) => {
             })
     }
 })
+
+
+//----- get all tailors------//
+router.get('/get_all_tailors', async (req, res) => {
+    try {
+        const get_tailor = await Tailor.find()
+        if (get_tailor.length == 0)
+            return res.json
+                ({
+                    success: false,
+                    error: "Taior does not exist",
+                })
+        if (get_tailor.length > 0)
+            return res.json
+                ({
+                    success: true,
+                    data: get_tailor,
+                })
+    }
+    catch (err) {
+        res.json({
+            success: false,
+            message: err
+        })
+    }
+
+})
+
+//-----  add favorite tailor   ------//
+router.put('/add_favorite_tailor/:tailor_id/:user_id', async (req, res) => {
+    try {
+        const get_tailor = await Tailor.findOne({ _id: req.params.tailor_id });
+        const favoriate_tailor = await User.findOneAndUpdate({ _id: req.params.user_id },
+            {
+                $push: {
+                    favorite_tailors: {
+                        tailor_id: get_tailor._id,
+                        first_name: get_tailor.first_name,
+                        last_name: get_tailor.last_name,
+                        city: get_tailor.city,
+                        type_of_tailor: get_tailor.type_of_tailor
+                    }
+                }
+            },
+            { new: true })
+
+        return res.json
+            ({
+                success: true,
+                message: "tailor added successfully",
+                data: favoriate_tailor,
+            })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+
+//-----  remove favorite tailor   ------//
+router.put('/remove_favorite_tailor/:tailor_id/:tailor_id', async (req, res) => {
+    try {
+        const get_tailor = await Tailor.findOne({ _id: req.params.tailor_id });
+        const favoriate_tailor = await User.findOneAndUpdate({ _id: req.params.user_id },
+            {
+                $pull: {
+                    favorite_tailors: {
+                        tailor_id: get_tailor._id,
+                    }
+                }
+            },
+            { new: true })
+
+        return res.json
+            ({
+                success: true,
+                message: "tailor removed successfully",
+                data: favoriate_tailor,
+            })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+
+//----- get all  favorite tailors------//
+router.get('/get_all_favorite_tailors/:user_id', async (req, res) => {
+    try {
+        const get_favorite_tailors = await User.find({ _id: req.params.user_id })
+            .select({ favorite_tailors: 1, _id: 0 })
+        if (get_favorite_tailors == null)
+            return res.json
+                ({
+                    success: false,
+                    error: "No tailor in favorite list",
+                })
+        if (get_favorite_tailors != null)
+            return res.json
+                ({
+                    success: true,
+                    data: get_favorite_tailors,
+                })
+    }
+    catch (err) {
+        res.json({
+            success: false,
+            message: "server error"
+        })
+    }
+
+})
+
+
 //-----  update email    ------//
 router.put('/email/:user_id', async (req, res) => {
     try {
