@@ -95,6 +95,39 @@ const user_schema = new mongoose.Schema
             type_of_tailor: {
                 type: String,
             }
+        }],
+        favorite_posts: [{
+            post_id: {
+                type: mongoose.Schema.Types.ObjectId
+            },
+            user_id: {
+                type: mongoose.Schema.Types.ObjectId
+            },
+            first_name:
+            {
+                type: String,
+                required: true,
+                minlength: 3,
+                maxlength: 120,
+            },
+            last_name:
+            {
+                type: String,
+                required: true,
+                minlength: 3,
+                maxlength: 120,
+            },
+            images: {
+                type: Array,
+            },
+            description: {
+                type: String,
+
+            },
+            date: {
+                type: Date,
+
+            }
         }]
     })
 

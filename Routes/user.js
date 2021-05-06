@@ -6,6 +6,8 @@ const upload = require('../multer')
 const cloudinary = require('../cloudinary')
 const fs = require('fs');
 const { Tailor } = require('../models/tailor');
+const { posts_validation, Post } = require('../models/posts');
+const { post } = require('./tailor');
 
 //-----     signup     ------//
 router.post('/signup', async (req, res) => {
@@ -153,14 +155,14 @@ router.put('/add_favorite_tailor/:tailor_id/:user_id', async (req, res) => {
 })
 
 //-----  remove favorite tailor   ------//
-router.put('/remove_favorite_tailor/:tailor_id/:tailor_id', async (req, res) => {
+router.put('/remove_favorite_tailor/:tailor_id/:user_id', async (req, res) => {
     try {
-        const get_tailor = await Tailor.findOne({ _id: req.params.tailor_id });
+        //  const get_tailor = await Tailor.findOne({ _id: req.params.tailor_id });
         const favoriate_tailor = await User.findOneAndUpdate({ _id: req.params.user_id },
             {
                 $pull: {
                     favorite_tailors: {
-                        tailor_id: get_tailor._id,
+                        tailor_id: req.params.tailor_id,
                     }
                 }
             },
@@ -286,6 +288,230 @@ router.put('/contact/:user_id', async (req, res) => {
             ({
                 success: true,
                 data: get_user,
+            })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+
+
+//-----    post a new trend      ------//
+router.post('/trend_upload/:user_id', upload.array('images'), async (req, res) => {
+    const uploader = async (path) => await cloudinary.uploads(path, 'Images');
+    var urls = []
+    const files = req.files;
+    for (const file of files) {
+        const { path } = file;
+        const newPath = await uploader(path)
+        urls.push(newPath)
+        fs.unlinkSync(path)
+    }
+    var photos = [];
+    console.log(urls)
+    const url = urls[0].url
+    for (var i = 0; i < urls.length; i++) {
+        photos.push(urls[i].url)
+    }
+    console.log(photos)
+
+    // const result = posts_validation(req.body);
+    // if (result.error != null) {
+    //     return res.json({
+    //         success: false,
+    //         status: 400,
+    //         message: result.error.details[0].message
+    //     })
+    // }
+    try {
+        var get_user = await User.findOne({
+            _id: req.params.user_id,
+        })
+        if (!get_user) {
+            return res.json
+                ({
+                    success: false,
+                    message: "user not ound",
+                    status: 400
+                })
+        }
+        if (get_user) {
+            const new_post = new Post
+                ({
+                    user_id: req.params.user_id,
+                    first_name: get_user.first_name,
+                    last_name: get_user.last_name,
+                    description: req.body.description,
+                    images: photos
+                })
+            const post = await new_post.save();
+            return res.json
+                ({
+                    success: true,
+                    message: "Trend uploaded ",
+                    data: post,
+                })
+        }
+    }
+    catch (err) {
+        return res.json
+            ({
+                success: false,
+                error: err,
+            })
+    }
+})
+
+//-----  update contact no    ------//
+router.put('/update_post/:post_id/:user_id', upload.array('images'), async (req, res) => {
+    const uploader = async (path) => await cloudinary.uploads(path, 'Images');
+    var urls = []
+    const files = req.files;
+    for (const file of files) {
+        const { path } = file;
+        const newPath = await uploader(path)
+        urls.push(newPath)
+        fs.unlinkSync(path)
+    }
+    var photos = [];
+    console.log(urls)
+    const url = urls[0].url
+    for (var i = 0; i < urls.length; i++) {
+        photos.push(urls[i].url)
+    }
+    console.log(photos)
+
+    try {
+        const get_post = await Post.findOneAndUpdate({
+            _id: req.params.post_id,
+            user_id: req.params.user_id
+        },
+            {
+                description: req.body.description,
+                images: photos,
+                updated: true
+            },
+            { new: true })
+        return res.json
+            ({
+                success: true,
+                data: get_post,
+            })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+
+
+//----- get complete profile detalis ------//
+router.get('/all_posts_of_user/:user_id', async (req, res) => {
+    const get_posts = await Post.find({ user_id: req.params.user_id })
+    if (get_posts.length == 0)
+        return res.json
+            ({
+                success: false,
+                error: "No post by this user",
+            })
+    if (get_posts.length > 0)
+        return res.json
+            ({
+                success: true,
+                data: get_posts,
+            })
+})
+
+//----- get complete profile detalis ------//
+router.get('/all_posts', async (req, res) => {
+    const get_posts = await Post.find({})
+    if (get_posts.length == 0)
+        return res.json
+            ({
+                success: false,
+                error: "No post exist",
+            })
+    if (get_posts.length > 0)
+        return res.json
+            ({
+                success: true,
+                data: get_posts,
+            })
+})
+
+//-----  add favorite tailor   ------//
+router.put('/add_favorite_post/:post_id/:user_id', async (req, res) => {
+    try {
+        const get_post = await Post.findOne({ _id: req.params.post_id });
+        console.log(get_post.user_id)
+
+        const favoriate_post = await User.findOneAndUpdate({ _id: req.params.user_id },
+            {
+                $push: {
+                    favorite_posts: {
+                        post_id: req.params.post_id,
+                        user_id: get_post.user_id,
+                        first_name: get_post.first_name,
+                        last_name: get_post.last_name,
+                        images: get_post.images,
+                        description: get_post.description,
+                        date: get_post.date,
+                    }
+                }
+            },
+            { new: true }).select({ favorite_posts: 1 })
+
+        return res.json
+            ({
+                success: true,
+                message: "Post added in favorite successfully",
+                data: favoriate_post,
+            })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+
+//-----  remove favorite tailor   ------//
+router.put('/remove_favorite_post/:post_id/:user_id', async (req, res) => {
+    try {
+        // const get_favoriate_tailor = await User.findOne({ _id: req.params.user_id, post_id: req.params.post_id })
+        // if (get_favoriate_tailor == null) {
+        //     return res.json
+        //         ({
+        //             success: false,
+        //             message: "Post does not exist in favorite list",
+        //         })
+
+        // }
+
+        const favorite_posts = await User.findOneAndUpdate({ _id: req.params.user_id },
+            {
+                $pull: {
+                    favorite_posts: {
+                        post_id: req.params.post_id,
+                    }
+                }
+            },
+            { new: true })
+
+        return res.json
+            ({
+                success: true,
+                message: "tailor removed successfully",
+                data: favorite_posts,
             })
     }
     catch (err) {
