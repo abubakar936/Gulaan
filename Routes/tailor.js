@@ -182,6 +182,37 @@ router.put('/contact/:tailor_id', async (req, res) => {
     }
 })
 
+
+//-----  update contact no    ------//
+router.put('/update_detils/:tailor_id', async (req, res) => {
+    try {
+        const get_tailor = await Tailor.findOneAndUpdate({ _id: req.params.tailor_id },
+            {
+                first_name: req.body.first_name,
+                last_name: req.body.last_name,
+                password: req.body.password,
+                city: req.body.city,
+                address: req.body.address,
+                contact: req.body.contact,
+                experience: req.body.experience,
+                average_rate_per_stitching: req.body.average_rate_per_stitching,
+            },
+            { new: true })
+        return res.json
+            ({
+                success: true,
+                data: get_tailor,
+            })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+
 //----- get all tailors ------//
 router.get('/get_all_tailors', async (req, res) => {
     try {

@@ -299,6 +299,34 @@ router.put('/contact/:user_id', async (req, res) => {
     }
 })
 
+//-----  update everything no    ------//
+router.put('/update_detils/:user_id', async (req, res) => {
+    try {
+        const get_user = await User.findOneAndUpdate({ _id: req.params.user_id },
+            {
+                first_name: req.body.first_name,
+                last_name: req.body.last_name,
+                password: req.body.password,
+                city: req.body.city,
+                address: req.body.address,
+                contact: req.body.contact,
+            },
+            { new: true })
+        return res.json
+            ({
+                success: true,
+                data: get_user,
+            })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+
 
 //-----    post a new trend      ------//
 router.post('/trend_upload/:user_id', upload.array('images'), async (req, res) => {
