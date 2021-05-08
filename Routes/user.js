@@ -312,12 +312,22 @@ router.post('/trend_upload/:user_id', upload.array('images'), async (req, res) =
         fs.unlinkSync(path)
     }
     var photos = [];
-    console.log(urls)
+    console.log(urls.length)
+    if (urls.length == 0) {
+        return res.json
+            ({
+                success: false,
+                message: "please upload atleast one image ",
+            })
+
+    }
+    console.log("this is urls ", urls)
     const url = urls[0].url
     for (var i = 0; i < urls.length; i++) {
         photos.push(urls[i].url)
     }
     console.log(photos)
+
 
     // const result = posts_validation(req.body);
     // if (result.error != null) {
@@ -445,6 +455,30 @@ router.get('/all_posts', async (req, res) => {
                 data: get_posts,
             })
 })
+
+
+//----- get complete profile detalis ------//
+router.get('/all_favorite_posts/:user_id', async (req, res) => {
+    const get_posts = await User.find({ _id: req.params.user_id }).select(
+        {
+            favorite_posts: 1
+        }
+    )
+    if (get_posts.length == 0)
+        return res.json
+            ({
+                success: false,
+                error: "No post exist",
+            })
+    if (get_posts.length > 0)
+        return res.json
+            ({
+                success: true,
+                data: get_posts,
+            })
+})
+
+
 
 //-----  add favorite tailor   ------//
 router.put('/add_favorite_post/:post_id/:user_id', async (req, res) => {
