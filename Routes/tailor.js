@@ -184,7 +184,21 @@ router.put('/contact/:tailor_id', async (req, res) => {
 
 
 //-----  update contact no    ------//
-router.put('/update_detils/:tailor_id', async (req, res) => {
+router.put('/update_detils/:tailor_id', upload.array('profile_photo'), async (req, res) => {
+
+    const uploader = async (path) => await cloudinary.uploads(path, 'Images');
+
+    const urls = []
+    const files = req.files;
+    for (const file of files) {
+        const { path } = file;
+        const newPath = await uploader(path)
+        urls.push(newPath)
+        fs.unlinkSync(path)
+    }
+    console.log(urls)
+    const url = urls[0].url
+
     try {
         const get_tailor = await Tailor.findOneAndUpdate({ _id: req.params.tailor_id },
             {
@@ -196,6 +210,8 @@ router.put('/update_detils/:tailor_id', async (req, res) => {
                 contact: req.body.contact,
                 experience: req.body.experience,
                 average_rate_per_stitching: req.body.average_rate_per_stitching,
+                profile_photo: url
+
             },
             { new: true })
         return res.json
