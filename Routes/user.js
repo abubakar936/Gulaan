@@ -338,8 +338,10 @@ router.post('/trend_upload/:user_id', upload.array('images'), async (req, res) =
         const newPath = await uploader(path)
         urls.push(newPath)
         fs.unlinkSync(path)
+        console.log(__dirname);
     }
     var photos = [];
+    console.log(photos)
     console.log(urls.length)
     if (urls.length == 0) {
         return res.json
