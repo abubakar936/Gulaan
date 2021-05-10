@@ -10,6 +10,8 @@ var corsOptions = {
     optionsSuccessStatus: 200 // For legacy browser support
 }
 app.set('view engine', 'ejs');
+app.use('/uploads', express.static('/uploads'));
+app.use(express.static(__dirname));
 app.use(cors(corsOptions));
 app.use(express.json());
 // var port = process.env.PORT || 8080;
