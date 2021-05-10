@@ -330,32 +330,36 @@ router.put('/update_detils/:user_id', async (req, res) => {
 
 //-----    post a new trend      ------//
 router.post('/trend_upload/:user_id', upload.array('images'), async (req, res) => {
-
     const uploader = async (path) => await cloudinary.uploads(path, 'Images');
-    var urls = []
-    const files = req.files;
-    for (const file of files) {
-        const { path } = file;
-        const newPath = await uploader(path)
-        urls.push(newPath)
-        fs.unlinkSync(path)
-    }
-    var photos = [];
-    console.log(urls.length)
-    if (urls.length == 0) {
-        return res.json
-            ({
-                success: false,
-                message: "please upload atleast one image ",
-            })
+    try {
+        var urls = []
+        const files = req.files;
+        for (const file of files) {
+            const { path } = file;
+            const newPath = await uploader(path)
+            urls.push(newPath)
+            fs.unlinkSync(path)
+        }
+        var photos = [];
+        console.log(urls.length)
+        if (urls.length == 0) {
+            return res.json
+                ({
+                    success: false,
+                    message: "please upload atleast one image ",
+                })
 
+        }
+        console.log("this is urls ", urls)
+        const url = urls[0].url
+        for (var i = 0; i < urls.length; i++) {
+            photos.push(urls[i].url)
+        }
+        console.log(photos)
+
+    } catch (err) {
+        console.log(err)
     }
-    console.log("this is urls ", urls)
-    const url = urls[0].url
-    for (var i = 0; i < urls.length; i++) {
-        photos.push(urls[i].url)
-    }
-    console.log(photos)
 
 
     // const result = posts_validation(req.body);
