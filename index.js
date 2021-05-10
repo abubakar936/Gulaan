@@ -15,7 +15,7 @@ app.use(express.static(__dirname));
 app.use(cors(corsOptions));
 app.use(express.json());
 // var port = process.env.PORT || 8080;
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/uploads'));
 app.use('/api/tailor', tailor);
 app.use('/api/user', user);
 
