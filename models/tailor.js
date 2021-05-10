@@ -100,7 +100,8 @@ const tailor_schema = new mongoose.Schema
             default: "https://www.google.com",
         },
         profile_photo: {
-            type: String
+            type: String,
+            default: ""
         },
 
 
