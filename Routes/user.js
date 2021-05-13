@@ -300,20 +300,20 @@ router.put('/contact/:user_id', async (req, res) => {
 })
 
 //-----  update everything no    ------//
-router.put('/update_detils/:user_id', upload.array('profile_photo'), async (req, res) => {
+router.put('/update_detils/:user_id', /*upload.array('profile_photo'), */async (req, res) => {
 
-    const uploader = async (path) => await cloudinary.uploads(path, 'Images');
+    // const uploader = async (path) => await cloudinary.uploads(path, 'Images');
 
-    const urls = []
-    const files = req.files;
-    for (const file of files) {
-        const { path } = file;
-        const newPath = await uploader(path)
-        urls.push(newPath)
-        fs.unlinkSync(path)
-    }
-    console.log(urls)
-    const url = urls[0].url
+    // const urls = []
+    // const files = req.files;
+    // for (const file of files) {
+    //     const { path } = file;
+    //     const newPath = await uploader(path)
+    //     urls.push(newPath)
+    //     fs.unlinkSync(path)
+    // }
+    // console.log(urls)
+    // const url = urls[0].url
     try {
         const get_user = await User.findOneAndUpdate({ _id: req.params.user_id },
             {
@@ -323,7 +323,7 @@ router.put('/update_detils/:user_id', upload.array('profile_photo'), async (req,
                 city: req.body.city,
                 address: req.body.address,
                 contact: req.body.contact,
-                profile_photo: url
+                profile_photo: req.body.profile_photo
             },
             { new: true })
         return res.json
