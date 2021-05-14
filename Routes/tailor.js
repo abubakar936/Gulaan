@@ -210,7 +210,7 @@ router.put('/update_detils/:tailor_id', /*upload.array('profile_photo'),*/ async
                 contact: req.body.contact,
                 experience: req.body.experience,
                 average_rate_per_stitching: req.body.average_rate_per_stitching,
-                profile_photo: req.body.profile_photo
+                //   profile_photo: req.body.profile_photo
 
             },
             { new: true })

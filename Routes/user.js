@@ -298,7 +298,7 @@ router.put('/contact/:user_id', async (req, res) => {
             })
     }
 })
-//update
+
 //-----  update everything no    ------//
 router.put('/update_detils/:user_id', /*upload.array('profile_photo'), */async (req, res) => {
 
@@ -323,8 +323,7 @@ router.put('/update_detils/:user_id', /*upload.array('profile_photo'), */async (
                 city: req.body.city,
                 address: req.body.address,
                 contact: req.body.contact,
-                profile_photo: req.body.profile_photo
-
+                //       profile_photo: req.body.profile_photo
             },
             { new: true })
         return res.json
