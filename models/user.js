@@ -78,7 +78,7 @@ const user_schema = new mongoose.Schema
         },
         profile_photo: {
             type: String,
-            default: ""
+            default: "http://res.cloudinary.com/dnfelxq6z/image/upload/v1621159792/Images/og3wxp1zfrei6pdzhfri.png"
         },
         favorite_tailors: [{
             tailor_id: {

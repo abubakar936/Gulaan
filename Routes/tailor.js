@@ -5,6 +5,7 @@ const router = express.Router();
 const upload = require('../multer')
 const cloudinary = require('../cloudinary')
 const fs = require('fs');
+const { Post } = require('../models/posts');
 
 //-----     signup     ------//
 router.post('/signup', async (req, res) => {
@@ -256,6 +257,109 @@ router.get('/get_all_tailors', async (req, res) => {
     }
 })
 
+
+//-----    post a new trend      ------//
+router.post('/trend_upload/:tailor_id', upload.array('images'), async (req, res) => {
+    const uploader = async (path) => await cloudinary.uploads(path, 'Images');
+    try {
+        var urls = []
+        const files = req.files;
+        for (const file of files) {
+            const { path } = file;
+            const newPath = await uploader(path)
+            urls.push(newPath)
+            fs.unlinkSync(path)
+        }
+        var photos = [];
+        console.log(urls.length)
+        if (urls.length == 0) {
+            return res.json
+                ({
+                    success: false,
+                    message: "please upload atleast one image ",
+                })
+
+        }
+        console.log("this is urls ", urls)
+        const url = urls[0].url
+        for (var i = 0; i < urls.length; i++) {
+            photos.push(urls[i].url)
+        }
+        console.log(photos)
+
+    } catch (err) {
+        console.log(err)
+    }
+
+
+    // const result = posts_validation(req.body);
+    // if (result.error != null) {
+    //     return res.json({
+    //         success: false,
+    //         status: 400,
+    //         message: result.error.details[0].message
+    //     })
+    // }
+    try {
+        var get_tailor = await Tailor.findOne({
+            _id: req.params.tailor_id,
+        })
+        console.log(get_tailor)
+        if (!get_tailor) {
+            return res.json
+                ({
+                    success: false,
+                    message: "tailor not ound",
+                    status: 400
+                })
+        }
+        if (get_tailor) {
+            const new_post = new Post
+                ({
+                    tailor_id: req.params.tailor_id,
+                    first_name: get_tailor.first_name,
+                    last_name: get_tailor.last_name,
+                    description: req.body.description,
+                    images: photos,
+                    profile_photo: get_tailor.profile_photo,
+                    tailor_post: true
+                })
+            const post = await new_post.save();
+            return res.json
+                ({
+                    success: true,
+                    message: "Trend uploaded ",
+                    data: post,
+                })
+        }
+    }
+    catch (err) {
+        return res.json
+            ({
+                success: false,
+                error: err,
+            })
+    }
+})
+
+
+
+//----- get complete profile detalis ------//
+router.get('/all_posts_by_tailors', async (req, res) => {
+    const get_posts = await Post.find({ tailor_post: true })
+    if (get_posts.length == 0)
+        return res.json
+            ({
+                success: false,
+                error: "No post exist",
+            })
+    if (get_posts.length > 0)
+        return res.json
+            ({
+                success: true,
+                data: get_posts,
+            })
+})
 
 
 function logInValidation(tailor) {

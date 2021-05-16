@@ -8,6 +8,7 @@ const fs = require('fs');
 const { Tailor } = require('../models/tailor');
 const { posts_validation, Post } = require('../models/posts');
 const { post } = require('./tailor');
+const { Customization } = require('../models/customization');
 
 //-----     signup     ------//
 router.post('/signup', async (req, res) => {
@@ -403,7 +404,9 @@ router.post('/trend_upload/:user_id', upload.array('images'), async (req, res) =
                     first_name: get_user.first_name,
                     last_name: get_user.last_name,
                     description: req.body.description,
-                    images: photos
+                    images: photos,
+                    profile_photo: get_user.profile_photo,
+                    user_post: true
                 })
             const post = await new_post.save();
             return res.json
@@ -604,6 +607,136 @@ router.put('/remove_favorite_post/:post_id/:user_id', async (req, res) => {
     }
 })
 
+
+
+
+
+//-----    post a new trend      ------//
+router.post('/customization/:user_id', upload.array('images'), async (req, res) => {
+    const uploader = async (path) => await cloudinary.uploads(path, 'Images');
+    try {
+        var urls = []
+        const files = req.files;
+        for (const file of files) {
+            const { path } = file;
+            const newPath = await uploader(path)
+            urls.push(newPath)
+            fs.unlinkSync(path)
+        }
+        var photos = [];
+        console.log(urls.length)
+        if (urls.length == 0) {
+            return res.json
+                ({
+                    success: false,
+                    message: "please upload atleast one image ",
+                })
+
+        }
+        console.log("this is urls ", urls)
+        const url = urls[0].url
+        for (var i = 0; i < urls.length; i++) {
+            photos.push(urls[i].url)
+        }
+        console.log(photos)
+
+    } catch (err) {
+        console.log(err)
+    }
+
+
+    // const result = posts_validation(req.body);
+    // if (result.error != null) {
+    //     return res.json({
+    //         success: false,
+    //         status: 400,
+    //         message: result.error.details[0].message
+    //     })
+    // }
+    try {
+        var get_user = await User.findOne({
+            _id: req.params.user_id,
+        })
+        if (!get_user) {
+            return res.json
+                ({
+                    success: false,
+                    message: "user not ound",
+                    status: 400
+                })
+        }
+        if (get_user) {
+            const new_customization = new Customization
+                ({
+                    user_id: req.params.user_id,
+                    first_name: get_user.first_name,
+                    last_name: get_user.last_name,
+                    description: req.body.description,
+                    images: photos,
+                    profile_photo: get_user.profile_photo,
+                    length: req.body.length,
+                    waist: req.body.waist,
+                    chest: req.body.chest,
+                    shoulder: req.body.shoulder,
+                    seleves: req.body.seleves,
+
+                })
+            const customization = await new_customization.save();
+            return res.json
+                ({
+                    success: true,
+                    message: "Customized dress uploaded ",
+                    data: new_customization,
+                })
+        }
+    }
+    catch (err) {
+        return res.json
+            ({
+                success: false,
+                error: err,
+            })
+    }
+})
+
+
+
+//----- get all customizations  ------//
+router.get('/all_customizations_of_user/:user_id', async (req, res) => {
+    const get_customizations = await Customization.find({ user_id: req.params.user_id })
+    if (get_customizations.length == 0)
+        return res.json
+            ({
+                success: false,
+                error: "No customizations by this user",
+            })
+    if (get_customizations.length > 0)
+        return res.json
+            ({
+                success: true,
+                data: get_customizations,
+            })
+})
+
+
+
+
+//----- get complete profile detalis ------//
+router.get('/all_customization', async (req, res) => {
+    const get_customization = await Customization.find({})
+    if (get_customization.length == 0)
+        return res.json
+            ({
+                success: false,
+                error: "No customizated dress  exist",
+            })
+    if (get_customization.length > 0)
+        return res.json
+            ({
+                success: true,
+                data: get_customization,
+            })
+})
 
 
 function logInValidation(user) {

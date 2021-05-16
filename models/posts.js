@@ -18,6 +18,9 @@ const posts_schema = new mongoose.Schema
         user_id: {
             type: mongoose.Schema.Types.ObjectId
         },
+        tailor_id: {
+            type: mongoose.Schema.Types.ObjectId
+        },
         first_name:
         {
             type: String,
@@ -43,9 +46,20 @@ const posts_schema = new mongoose.Schema
             type: Boolean,
             default: false
         },
+        profile_photo: {
+            type: String
+        },
         date: {
             type: Date,
             default: Date.now()
+        },
+        user_post: {
+            type: Boolean,
+            default: false
+        },
+        tailor_post: {
+            type: Boolean,
+            default: false
         }
     })
 
