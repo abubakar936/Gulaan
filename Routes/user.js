@@ -9,6 +9,7 @@ const { Tailor } = require('../models/tailor');
 const { posts_validation, Post } = require('../models/posts');
 const { post } = require('./tailor');
 const { Customization } = require('../models/customization');
+const { BiddingRequest } = require('../models/bidingRequests');
 
 //-----     signup     ------//
 router.post('/signup', async (req, res) => {
@@ -698,7 +699,25 @@ router.post('/customization/:user_id', upload.array('images'), async (req, res) 
             })
     }
 })
-
+router.get('/get_all_biding/:user_id', async (req, res) => {
+    var get_biding = await BiddingRequest.find({
+        "user.user_id": req.params.user_id,
+    })
+    if (get_biding.length == 0) {
+        return res.json
+            ({
+                success: false,
+                message: "no request yet"
+            })
+    }
+    if (get_biding.length != 0) {
+        return res.json
+            ({
+                success: true,
+                data: get_biding,
+            })
+    }
+})
 
 
 //----- get all customizations  ------//

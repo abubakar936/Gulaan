@@ -234,6 +234,29 @@ router.put('/update_detils/:tailor_id', /*upload.array('profile_photo'),*/ async
     }
 })
 
+router.get('/get_all_biding/:tailor_id', async (req, res) => {
+    var get_biding = await BiddingRequest.find({
+        "tailor.tailor_id": req.params.tailor_id,
+    })
+    if (get_biding.length == 0) {
+        return res.json
+            ({
+                success: false,
+                message: "no request yet"
+            })
+    }
+    if (get_biding.length != 0) {
+        return res.json
+            ({
+                success: true,
+                data: get_biding,
+            })
+    }
+})
+
+
+
+
 //----- get all tailors ------//
 router.get('/get_all_tailors', async (req, res) => {
     try {
@@ -411,6 +434,9 @@ router.post('/bidingRequest', async (req, res) => {
     }
 
 })
+
+
+
 
 //-----    post a new trend      ------//
 router.post('/trend_upload/:tailor_id', upload.array('images'), async (req, res) => {
