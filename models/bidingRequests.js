@@ -131,11 +131,11 @@ const bidingRequest_schema = new mongoose.Schema
         }),
         amount: {
             type: Number,
-            required: true
+           
         },
         days: {
             type: Number,
-            required: true
+           
         },
         status: {
             type: String,

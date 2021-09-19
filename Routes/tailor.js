@@ -398,8 +398,7 @@ router.post('/bidingRequest', async (req, res) => {
                     images: get_tailor.images,
                     profile_photo: get_tailor.profile_photo
                 },
-                amount: req.body.amount,
-                days: req.body.days,
+
 
             })
         const new_bid = await new_request.save();
