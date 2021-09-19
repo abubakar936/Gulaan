@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
+const { json } = require('express');
 
 // function customization_validation(post) {
 //     const joi_posts_schema = Joi.object
@@ -20,7 +21,7 @@ const customization_schema = new mongoose.Schema
         },
         first_name:
         {
-            type: String,
+            type:String,
             required: true,
             minlength: 3,
             maxlength: 120,

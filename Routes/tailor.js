@@ -6,6 +6,9 @@ const upload = require('../multer')
 const cloudinary = require('../cloudinary')
 const fs = require('fs');
 const { Post } = require('../models/posts');
+const { BiddingRequest } = require('../models/bidingRequests');
+const { Customization } = require('../models/customization');
+const { User } = require('../models/user');
 
 //-----     signup     ------//
 router.post('/signup', async (req, res) => {
@@ -256,7 +259,159 @@ router.get('/get_all_tailors', async (req, res) => {
             })
     }
 })
+router.post('/bidingRequest', async (req, res) => {
+    var get_biding = await BiddingRequest.findOneAndRemove({
+        "user.user_id": req.body.user_id,
+        "tailor.tailor_id": req.body.tailor_id,
+        "post.post_id": req.body.post_id
+    }
+    )
 
+    console.log(get_biding)
+    if (get_biding) {
+        //  var delete_biding = await BiddingRequest.findByIdAndDelete({
+        return res.json
+            ({
+                success: false,
+                message: "Biding request deleted",
+                status: 400
+            })
+    }
+    var get_tailor = await Tailor.findOne({
+        _id: req.body.tailor_id,
+    })
+    //  console.log(get_tailor)
+    if (!get_tailor) {
+        return res.json
+            ({
+                success: false,
+                message: "tailor not found",
+                status: 404
+            })
+    }
+    var postid = req.body.post_id
+    var get_user = await User.findOne({ _id: req.body.user_id })
+    //    console.log(get_customizations)
+    if (!get_user) {
+        return res.json
+            ({
+                success: false,
+                message: "user not found",
+                status: 404
+            })
+    }
+    if (req.body.post_id) {
+        var get_customizations = await Customization.findOne({ _id: req.body.post_id })
+        //    console.log(get_customizations)
+        if (!get_customizations) {
+            return res.json
+                ({
+                    success: false,
+                    message: "post not found",
+                    status: 404
+                })
+        }
+        const new_request = new BiddingRequest
+            ({
+                user: {
+                    user_id: req.body.user_id,
+                    first_name: get_user.first_name,
+                    last_name: get_user.last_name,
+                    email: get_user.email,
+                    contact: get_user.contact,
+                    city: get_user.city,
+                    address: get_user.address,
+                    profile_photo: get_user.profile_photo
+
+                },
+                post: {
+                    post_id: get_customizations._id,
+                    post_images: get_customizations.images,
+                    post_description: get_customizations.description,
+                    post_date: get_customizations.date,
+                    length: get_customizations.length,
+                    waist: get_customizations.waist,
+                    chest: get_customizations.chest,
+                    shoulder: get_customizations.shoulder,
+                    seleves: get_customizations.seleves,
+                },
+                tailor: {
+                    tailor_id: get_tailor._id,
+                    first_name: get_tailor.first_name,
+                    last_name: get_tailor.last_name,
+                    email: get_tailor.email,
+                    contact: get_tailor.contact,
+                    city: get_tailor.city,
+                    address: get_tailor.address,
+                    experience: get_tailor.experience,
+                    average_rate_per_stitching: get_tailor.average_rate_per_stitching,
+                    images: get_tailor.images,
+                    profile_photo: get_tailor.profile_photo
+                },
+                amount: req.body.amount,
+                days: req.body.days,
+
+            })
+        const new_bid = await new_request.save();
+        return res.json
+            ({
+                success: true,
+                message: "Bidding send ",
+                data: new_bid,
+            })
+    }
+    else {
+        var get_user = await User.findOne({ _id: req.body.user_id })
+        //    console.log(get_customizations)
+        if (!get_user) {
+            return res.json
+                ({
+                    success: false,
+                    message: "user not found",
+                    status: 404
+                })
+        }
+        const new_request = new BiddingRequest
+            ({
+                user: {
+                    user_id: req.body.user_id,
+                    first_name: get_user.first_name,
+                    last_name: get_user.last_name,
+                    email: get_user.email,
+                    contact: get_user.contact,
+                    city: get_user.city,
+                    address: get_user.address,
+                    profile_photo: get_user.profile_photo
+
+                },
+
+                tailor: {
+                    tailor_id: get_tailor._id,
+                    first_name: get_tailor.first_name,
+                    last_name: get_tailor.last_name,
+                    email: get_tailor.email,
+                    contact: get_tailor.contact,
+                    city: get_tailor.city,
+                    address: get_tailor.address,
+                    experience: get_tailor.experience,
+                    average_rate_per_stitching: get_tailor.average_rate_per_stitching,
+                    images: get_tailor.images,
+                    profile_photo: get_tailor.profile_photo
+                },
+                amount: req.body.amount,
+                days: req.body.days,
+
+            })
+        const new_bid = await new_request.save();
+        return res.json
+            ({
+                success: true,
+                message: "Bidding send ",
+                data: new_bid,
+            })
+    }
+
+})
 
 //-----    post a new trend      ------//
 router.post('/trend_upload/:tailor_id', upload.array('images'), async (req, res) => {
