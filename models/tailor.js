@@ -15,6 +15,9 @@ function tailor_validation(tailor) {
             experience: Joi.number().required(),
             type_of_tailor: Joi.string().min(2).max(1024), //ladies or gents
             average_rate_per_stitching: Joi.number().required(),
+            lang: Joi.number(),
+            lat: Joi.number(),
+
             //images: Joi.string().min(2).max(1024),
             // menu_name: Joi.string().min(2).max(1024),
             // menu_price: Joi.number(),
@@ -69,6 +72,12 @@ const tailor_schema = new mongoose.Schema
             type: String,
             required: true,
         },
+        lang: {
+            type: Number,
+        },
+        lat: {
+            type: Number,
+        },
         experience:
         {
             type: String,
@@ -88,6 +97,10 @@ const tailor_schema = new mongoose.Schema
         randomString:
         {
             type: String,
+        },
+        stripe_account_id:{
+            type:String,
+            default:"",
         },
         email_varification:
         {

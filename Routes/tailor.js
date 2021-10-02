@@ -41,6 +41,9 @@ router.post('/signup', async (req, res) => {
                 experience: req.body.experience,
                 type_of_tailor: req.body.type_of_tailor,
                 average_rate_per_stitching: req.body.average_rate_per_stitching,
+                lang: req.body.lang,
+                lat: req.body.lat,
+
             })
         const tailor = await new_tailor.save();
         return res.json
@@ -435,6 +438,151 @@ router.post('/bidingRequest', async (req, res) => {
 
 })
 
+router.put('/stripe_account/:tailor_id', async (req, res) => {
+
+    try {
+        const stripe = require('stripe')('sk_test_51IafIsKpjrUzbb0EwWRaMtI4o1raPutioih1FFgJHmkb2eLYcM98eF04Ddb5D3jhgLrncCulnL4L88anxbfpymdf00VI0szXe4');
+
+        const account = await stripe.accounts.create({
+            type: 'custom',
+            country: 'US',
+            email: req.body.email,
+            capabilities: {
+                card_payments: { requested: true },
+                transfers: { requested: true },
+            },
+        });
+        const gettailor = await Tailor.findOneAndUpdate({ _id: req.params.tailor_id },
+            {
+                stripe_account_id: account.id,
+            },
+            { new: true }
+        )
+        // console.log(account)
+        var accountLink = await stripe.accountLinks.create({
+            account: account.id,
+            success_url: 'https://www.google.com/',
+            failure_url: 'https://www.youtube.com/',
+            type: 'custom_account_verification',
+            collect: 'eventually_due'
+        })
+
+
+        console.log(accountLink);
+
+        return res.json
+            ({
+                success: true,
+                message: 'Account added successfully',
+                data: gettailor,
+                redirect: accountLink.url
+            })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+router.put('/update_bidding_status/:bidding_id', async (req, res) => {
+    if (req.body.status == "accepted") {
+        try {
+            const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+            var token = await stripe.tokens.create({
+                card: {
+                    number: req.body.card_number,
+                    exp_month: req.body.exp_month,
+                    exp_year: req.body.exp_year,
+                    cvc: req.body.cvc,
+                },
+            });
+            //   console.log(token.id)
+        }
+        catch (err) {
+            return res.json({
+                success: false,
+                message: err.raw.message,
+            })
+        }
+        var get_bidding = await BiddingRequest.findOneAndUpdate({ _id: req.params.bidding_id },
+            {
+                status: "accepted",
+                card_token_id: token
+            })
+        return res.json({
+            success: true,
+            message: "Request accepted ",
+
+        })
+
+    }
+    if (req.body.status == "completed") {
+        var get_one_bidding = await BiddingRequest.findOne({ _id: req.params.bidding_id },
+            {
+                status: "accepted"
+            }
+        )
+        try {
+            const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+            const charge = await stripe.charges.create({
+                amount: (get_one_bidding.amount) * 100,
+                currency: 'usd',
+                source: get_one_bidding.stripe_account_id,
+                description: 'Payment done ',
+            });
+            //  console.log(charge);
+        }
+        catch (err) {
+            return res.json({
+                success: false,
+                message: err,
+            })
+        }
+        try {
+            const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+            // Create a PaymentIntent:
+            const paymentIntent = await stripe.paymentIntents.create({
+                amount: (get_one_bidding.amount) * 100,
+                // source: token.id,
+                currency: 'usd',
+                payment_method_types: ['card'],
+                transfer_group: '{ORDER10}',
+            });
+
+            // Create a Transfer to the connected account (later):
+            const transfer = await stripe.transfers.create({
+                amount: ((get_one_bidding.amount * 100) / 100) * 70,
+                currency: 'usd',
+                destination: "acct_1IuaWn4DizgR8LJx",
+                transfer_group: '{ORDER10}',
+            });
+            console.log(transfer);
+        }
+        catch (err) {
+            return res.json({
+                success: false,
+                message: err.raw.message,
+            })
+        }
+        return res.json({
+            success: true,
+            message: "Request completed and payment transfer successfully ",
+            transfer_data: transfer
+        })
+
+    }
+    if (req.body.status == "rejected") {
+        var get_bidding = await BiddingRequest.findOneAndRemove({ _id: req.params.bidding_id })
+        return res.json({
+            success: true,
+            message: "bidding request rejected",
+
+        })
+    }
+})
 
 
 

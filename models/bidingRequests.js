@@ -131,15 +131,19 @@ const bidingRequest_schema = new mongoose.Schema
         }),
         amount: {
             type: Number,
-           
+
         },
         days: {
             type: Number,
-           
+
         },
         status: {
             type: String,
             default: "pending"
+        },
+        card_token_id: {
+            type: String,
+
         }
     })
 
