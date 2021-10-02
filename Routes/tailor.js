@@ -473,8 +473,8 @@ router.put('/stripe_account/:tailor_id', async (req, res) => {
         return res.json
             ({
                 success: true,
-                message: 'Account added successfully',
-                data: gettailor,
+                message: 'Account added successfully click on this ' + accountLink.url + " to add all information of your account",
+                // data: gettailor,
                 redirect: accountLink.url
             })
     }
@@ -509,7 +509,7 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
         var get_bidding = await BiddingRequest.findOneAndUpdate({ _id: req.params.bidding_id },
             {
                 status: "accepted",
-                card_token_id: token
+                card_token_id: token.id
             })
         return res.json({
             success: true,
@@ -519,17 +519,19 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
 
     }
     if (req.body.status == "completed") {
-        var get_one_bidding = await BiddingRequest.findOne({ _id: req.params.bidding_id },
+        var get_one_bidding = await BiddingRequest.findOneAndUpdate({ _id: req.params.bidding_id },
             {
                 status: "accepted"
             }
         )
+        console.log("amount", get_one_bidding.amount)
+        console.log("card token id ", get_one_bidding.card_token_id)
         try {
             const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
             const charge = await stripe.charges.create({
                 amount: (get_one_bidding.amount) * 100,
                 currency: 'usd',
-                source: get_one_bidding.stripe_account_id,
+                source: get_one_bidding.card_token_id,
                 description: 'Payment done ',
             });
             //  console.log(charge);
@@ -553,7 +555,7 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
             });
 
             // Create a Transfer to the connected account (later):
-            const transfer = await stripe.transfers.create({
+            var transfer = await stripe.transfers.create({
                 amount: ((get_one_bidding.amount * 100) / 100) * 70,
                 currency: 'usd',
                 destination: "acct_1IuaWn4DizgR8LJx",
