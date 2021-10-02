@@ -510,10 +510,12 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
             {
                 status: "accepted",
                 card_token_id: token.id
-            })
+            },
+            { new: true })
         return res.json({
             success: true,
             message: "Request accepted ",
+            data: get_bidding
 
         })
 
@@ -521,8 +523,9 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
     if (req.body.status == "completed") {
         var get_one_bidding = await BiddingRequest.findOneAndUpdate({ _id: req.params.bidding_id },
             {
-                status: "accepted"
-            }
+                status: "completed"
+            },
+            { new: true }
         )
         console.log("amount", get_one_bidding.amount)
         console.log("card token id ", get_one_bidding.card_token_id)
@@ -572,7 +575,8 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
         return res.json({
             success: true,
             message: "Request completed and payment transfer successfully ",
-            transfer_data: transfer
+            transfer_data: transfer,
+            data: get_one_bidding
         })
 
     }
@@ -689,6 +693,51 @@ router.get('/all_posts_by_tailors', async (req, res) => {
                 success: true,
                 data: get_posts,
             })
+})
+
+
+//--------     get total number of vendors --------//
+router.post('/all_near_tailors', async (req, res) => {
+    try {
+        var Longitude = req.body.lang
+        var latitude = req.body.lat
+        var Longitude1 = Longitude - 0.3999
+        var Longitude2 = Longitude + 0.3999
+        console.log(Longitude1)
+        console.log(Longitude2)
+        var latitude1 = latitude - 0.3999
+        var latitude2 = latitude + 0.3999
+        const get_tailor = await Tailor.
+            find({
+                lang: { $lt: Longitude2, $gt: Longitude1 },
+                lat: { $lt: latitude2, $gt: latitude1 },
+                // Longitude1:{$lt:Longitude},
+                // Longitude2:{$gt:Longitude},
+                // latitude1:{$lt:latitude},
+                // latitude2:{$gt:latitude},
+            })
+
+        console.log(get_tailor)
+        if (get_tailor == 0)
+            return res.json
+                ({
+                    success: false,
+                    error: "No tailor exist",
+                })
+        if (get_tailor != null)
+            return res.json
+                ({
+                    success: true,
+                    data: get_tailor,
+                })
+    }
+    catch (err) {
+        return res.json
+            ({
+                success: false,
+                data: err,
+            })
+    }
 })
 
 
