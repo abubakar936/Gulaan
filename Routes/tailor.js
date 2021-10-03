@@ -487,7 +487,7 @@ router.put('/stripe_account/:tailor_id', async (req, res) => {
     }
 })
 router.put('/update_bidding_status/:bidding_id', async (req, res) => {
-    if (req.body.status == "accepted") {
+    if (req.body.status == "accepted" && req.body.request_from == "user") {
         try {
             const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
             var token = await stripe.tokens.create({
@@ -520,6 +520,22 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
         })
 
     }
+    if (req.body.status == "accepted" && req.body.request_from == "tailor") {
+        var get_bidding = await BiddingRequest.findOneAndUpdate({ _id: req.params.bidding_id },
+            {
+                status: "accepted",
+
+            },
+            { new: true })
+        return res.json({
+            success: true,
+            message: "Request accepted ",
+            data: get_bidding
+
+        })
+
+    }
+
     if (req.body.status == "completed") {
         var get_one_bidding = await BiddingRequest.findOneAndUpdate({ _id: req.params.bidding_id },
             {

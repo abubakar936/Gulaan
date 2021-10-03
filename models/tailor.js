@@ -28,7 +28,7 @@ function tailor_validation(tailor) {
 
 const tailor_schema = new mongoose.Schema
     ({
-        first_name:
+        first_name :
         {
             type: String,
             required: true,
