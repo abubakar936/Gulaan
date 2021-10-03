@@ -592,7 +592,7 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
 
 
 
-//-----    post a new trend      ------//
+//-----    post a new trend      -----//
 router.post('/trend_upload/:tailor_id', upload.array('images'), async (req, res) => {
     const uploader = async (path) => await cloudinary.uploads(path, 'Images');
     try {
