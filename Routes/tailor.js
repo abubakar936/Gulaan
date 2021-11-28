@@ -525,7 +525,7 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
             {
                 status: "accepted",
 
-            },
+            },   
             { new: true })
         return res.json({
             success: true,
@@ -543,7 +543,7 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
             },
             { new: true }
         )
-        console.log("amount", get_one_bidding.amount)
+        console.log("amoun t", get_one_bidding.amount)
         console.log("card token id ", get_one_bidding.card_token_id)
         try {
             const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
