@@ -3,6 +3,7 @@ const cors = require('cors');
 const app = express();
 const tailor = require('./Routes/tailor');
 const user = require('./Routes/user');
+const admin = require('./Routes/admin');
 
 
 var corsOptions = {
@@ -21,6 +22,7 @@ app.use(express.static(__dirname + '/uploads'));
 app.use('/api/tailor', tailor);
 app.use('/api/user', user);
 
+app.use('/api/admin', admin);
 const mongoose = require('mongoose');
 mongoose.connect("mongodb+srv://Abubakar:DfohKvcRnMz7UOjm@cluster0.z1hqb.mongodb.net/Gulaan",
     { useNewUrlParser: true },
