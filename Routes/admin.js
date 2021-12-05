@@ -9,6 +9,7 @@ const cloudinary = require('../cloudinary')
 const fs = require('fs');
 const { Post } = require('../models/posts');
 const { Customization } = require('../models/customization');
+const { BiddingRequest } = require('../models/bidingRequests');
 
 //-----     signup     ------//
 router.post('/addtailor', async (req, res) => {
@@ -124,6 +125,70 @@ router.get('/get_all_tailors', async (req, res) => {
             })
     }
 })
+
+router.get('/get_all_user', async (req, res) => {
+    try {
+        const get_user = await User.find()
+        if (get_user == null)
+            return res.json
+                ({
+                    success: false,
+                    error: "NO user exist",
+                })
+        if (get_user != null)
+            return res.json
+                ({
+                    success: true,
+                    data: get_user,
+                })
+    }
+    catch (err) {
+        return res.status(500).json
+            ({
+                success: false,
+                message: err,
+            })
+    }
+})
+router.get('/delete_user/:id', async (req, res) => {
+
+    const get_user = await User.findOneAndDelete({
+        _id: req.params.id
+    }
+    )
+
+    return res.json
+        ({
+            success: true,
+            message: "deleted succesfully",
+            data: get_user,
+        })
+
+})
+
+
+
+router.get('/get_all_biding', async (req, res) => {
+    var get_biding = await BiddingRequest.find({
+
+    })
+    if (get_biding.length == 0) {
+        return res.json
+            ({
+                success: false,
+                message: "no request yet"
+            })
+    }
+    if (get_biding.length != 0) {
+        return res.json
+            ({
+                success: true,
+                data: get_biding,
+            })
+    }
+})
+
+
 
 
 router.get('/all_posts_by_tailors', async (req, res) => {

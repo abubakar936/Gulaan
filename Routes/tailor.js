@@ -525,7 +525,7 @@ router.put('/update_bidding_status/:bidding_id', async (req, res) => {
             {
                 status: "accepted",
 
-            },   
+            },
             { new: true })
         return res.json({
             success: true,
@@ -725,8 +725,8 @@ router.post('/all_near_tailors', async (req, res) => {
         var latitude2 = latitude + 0.3999
         const get_tailor = await Tailor.
             find({
-                lang: { $lt: Longitude2, $gt: Longitude1 },
-                lat: { $lt: latitude2, $gt: latitude1 },
+                // lang: { $lt: Longitude2, $gt: Longitude1 },
+                // lat: { $lt: latitude2, $gt: latitude1 },
                 // Longitude1:{$lt:Longitude},
                 // Longitude2:{$gt:Longitude},
                 // latitude1:{$lt:latitude},
