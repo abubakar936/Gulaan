@@ -262,29 +262,31 @@ router.get('/get_all_biding/:tailor_id', async (req, res) => {
 
 //----- get all tailors ------//
 router.get('/get_all_tailors', async (req, res) => {
-    try {
-        const get_tailor = await Tailor.find()
-        if (get_tailor == null)
-            return res.json
-                ({
-                    success: false,
-                    error: "NO Tailor exist",
-                })
-        if (get_tailor != null)
-            return res.json
-                ({
-                    success: true,
-                    data: get_tailor,
-                })
-    }
-    catch (err) {
-        return res.status(500).json
+
+    console.log("request coming ")
+    const get_tailor = await Tailor.find()
+    console.log("--------------getting tailors------------")
+    console.log("--------------getting tailors------------")
+
+    if (get_tailor.length == 0)
+        return res.json
             ({
                 success: false,
-                message: err,
+                error: "NO Tailor exist",
             })
-    }
+    console.log("--------------tailor res-----------", get_tailor)
+
+    if (get_tailor.length > 0)
+        return res.json
+            ({
+                success: true,
+                data: get_tailor,git a
+            })
+    console.log("--------------tailor res-- length is greater then 0---------", get_tailor);
+
 })
+
+
 router.post('/bidingRequest', async (req, res) => {
     var get_biding = await BiddingRequest.findOneAndRemove({
         "user.user_id": req.body.user_id,
