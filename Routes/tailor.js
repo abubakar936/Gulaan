@@ -280,7 +280,7 @@ router.get('/get_all_tailors', async (req, res) => {
         return res.json
             ({
                 success: true,
-                data: get_tailor,git a
+                data: get_tailor,
             })
     console.log("--------------tailor res-- length is greater then 0---------", get_tailor);
 
